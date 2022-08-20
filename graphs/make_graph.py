@@ -1,9 +1,16 @@
+import argparse
 import random
 import numpy as np
 from tqdm import tqdm
 import pandas as pd
 import os
 import pickle
+
+parser = argparse.ArgumentParser()
+
+parser.add_argument('--name', type=str, help='experiment name', default='train_reco')
+
+args = parser.parse_args()
 
 root_data_path = '../../reco_search_data/'
 def gen_neg_samples(items_with_popular, postive_item, user_rec_his, num_negs):
@@ -89,11 +96,53 @@ for k in user_vocab.keys():
     for s_id in user_vocab[k]['src_his']:
         user_vocab[k]['click_items'] += s_session_vocab[s_id]['click_items']
 
-train_final_data_reco = final_process(train_inter_data, user_vocab, 'reco', train_inter_data['i_id'], True)
-#train_final_data_src = final_process(train_inter_src_data, user_vocab, 'search', train_inter_data['i_id'], True)
-#test_final_data = final_process(test_inter_src_data, user_vocab, 'reco', train_inter_data['i_id'], False)
-#valid_final_data = final_process(valid_inter_src_data, user_vocab, 'reco', train_inter_data['i_id'], False)
-with open(os.path.join(root_data_path, "train_data_reco.txt"), 'w') as f:
-    for line in train_final_data_reco:
-        f.writelines(line)
-        f.write('\n')
+
+if args.name=='train_reco_1':
+    train_final_data_reco_1 = final_process(train_inter_data[:2500000], user_vocab, 'reco', train_inter_data['i_id'], True)
+    with open(os.path.join(root_data_path, "train_data_reco_1.txt"), 'w') as f:
+        for line in train_final_data_reco_1:
+            f.writelines(line)
+            f.write('\n')
+
+elif args.name=='train_reco_2':
+    train_final_data_reco_2 = final_process(train_inter_data[2500000:5000000], user_vocab, 'reco', train_inter_data['i_id'], True)
+    with open(os.path.join(root_data_path, "train_data_reco_2.txt"), 'w') as f:
+        for line in train_final_data_reco_2:
+            f.writelines(line)
+            f.write('\n')
+elif args.name=='train_reco_3':
+    train_final_data_reco_3 = final_process(train_inter_data[5000000:7500000], user_vocab, 'reco', train_inter_data['i_id'], True)
+    with open(os.path.join(root_data_path, "train_data_reco_3.txt"), 'w') as f:
+        for line in train_final_data_reco_3:
+            f.writelines(line)
+            f.write('\n')
+
+elif args.name=='train_reco_4':
+    train_final_data_reco_4 = final_process(train_inter_data[7500000:], user_vocab, 'reco', train_inter_data['i_id'], True)
+    with open(os.path.join(root_data_path, "train_data_reco_4.txt"), 'w') as f:
+        for line in train_final_data_reco_4:
+            f.writelines(line)
+            f.write('\n')
+
+
+elif args.name=='train_src':
+    train_final_data_src = final_process(train_inter_src_data, user_vocab, 'search', train_inter_data['i_id'], True)
+    with open(os.path.join(root_data_path, "train_final_data_src.txt"), 'w') as f:
+        for line in train_final_data_src:
+            f.writelines(line)
+            f.write('\n')
+
+elif args.name=='test':
+    test_final_data = final_process(test_inter_data, user_vocab, 'reco', train_inter_data['i_id'], False)
+    with open(os.path.join(root_data_path, "test_final_data.txt"), 'w') as f:
+        for line in test_final_data:
+            f.writelines(line)
+            f.write('\n')
+
+elif args.name=='valid':
+    valid_final_data = final_process(valid_inter_data, user_vocab, 'reco', train_inter_data['i_id'], False)
+    with open(os.path.join(root_data_path, "valid_final_data.txt"), 'w') as f:
+        for line in valid_final_data:
+            f.writelines(line)
+            f.write('\n')
+
