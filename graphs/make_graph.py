@@ -81,10 +81,10 @@ for i in range(len(train_src_inter_all['user_id'])):
 
 test_inter_data = pd.read_csv(os.path.join(root_data_path, 'test_inter.tsv'), sep='\t')
 test_inter_data[['ts', 'i_id']] = test_inter_data[['ts', 'i_id']].astype(np.int64)
-
+test_inter_data_dict = test_inter_data.to_dict('list')
 valid_inter_data = pd.read_csv(os.path.join(root_data_path, 'valid_inter.tsv'), sep='\t')
 valid_inter_data[['ts', 'i_id']] = valid_inter_data[['ts', 'i_id']].astype(np.int64)
-
+valid_inter_data_dict = valid_inter_data.to_dict('list')
 with open(os.path.join(root_data_path, 's_session_vocab.pickle'), 'rb') as f:
     s_session_vocab = pickle.load(f)
 
@@ -98,27 +98,31 @@ for k in user_vocab.keys():
 
 
 if args.name=='train_reco_1':
-    train_final_data_reco_1 = final_process(train_inter_data[:2500000], user_vocab, 'reco', train_inter_data['i_id'], True)
+    train_inter_data_1_dict = train_inter_data[:2500000].to_dict('list')
+    train_final_data_reco_1 = final_process(train_inter_data_1_dict, user_vocab, 'reco', train_inter_data_dict['i_id'], True)
     with open(os.path.join(root_data_path, "train_data_reco_1.txt"), 'w') as f:
         for line in train_final_data_reco_1:
             f.writelines(line)
             f.write('\n')
 
 elif args.name=='train_reco_2':
-    train_final_data_reco_2 = final_process(train_inter_data[2500000:5000000], user_vocab, 'reco', train_inter_data['i_id'], True)
+    train_inter_data_2_dict = train_inter_data[2500000:5000000].to_dict('list')
+    train_final_data_reco_2 = final_process(train_inter_data_2_dict, user_vocab, 'reco', train_inter_data_dict['i_id'], True)
     with open(os.path.join(root_data_path, "train_data_reco_2.txt"), 'w') as f:
         for line in train_final_data_reco_2:
             f.writelines(line)
             f.write('\n')
 elif args.name=='train_reco_3':
-    train_final_data_reco_3 = final_process(train_inter_data[5000000:7500000], user_vocab, 'reco', train_inter_data['i_id'], True)
+    train_inter_data_3_dict = train_inter_data[5000000:7500000].to_dict('list')
+    train_final_data_reco_3 = final_process(train_inter_data_3_dict, user_vocab, 'reco', train_inter_data_dict['i_id'], True)
     with open(os.path.join(root_data_path, "train_data_reco_3.txt"), 'w') as f:
         for line in train_final_data_reco_3:
             f.writelines(line)
             f.write('\n')
 
 elif args.name=='train_reco_4':
-    train_final_data_reco_4 = final_process(train_inter_data[7500000:], user_vocab, 'reco', train_inter_data['i_id'], True)
+    train_inter_data_4_dict = train_inter_data[7500000:].to_dict('list')
+    train_final_data_reco_4 = final_process(train_inter_data_4_dict, user_vocab, 'reco', train_inter_data_dict['i_id'], True)
     with open(os.path.join(root_data_path, "train_data_reco_4.txt"), 'w') as f:
         for line in train_final_data_reco_4:
             f.writelines(line)
@@ -126,21 +130,21 @@ elif args.name=='train_reco_4':
 
 
 elif args.name=='train_src':
-    train_final_data_src = final_process(train_inter_src_data, user_vocab, 'search', train_inter_data['i_id'], True)
+    train_final_data_src = final_process(train_inter_src_data, user_vocab, 'search', train_inter_data_dict['i_id'], True)
     with open(os.path.join(root_data_path, "train_final_data_src.txt"), 'w') as f:
         for line in train_final_data_src:
             f.writelines(line)
             f.write('\n')
 
 elif args.name=='test':
-    test_final_data = final_process(test_inter_data, user_vocab, 'reco', train_inter_data['i_id'], False)
+    test_final_data = final_process(test_inter_data_dict, user_vocab, 'reco', train_inter_data_dict['i_id'], False)
     with open(os.path.join(root_data_path, "test_final_data.txt"), 'w') as f:
         for line in test_final_data:
             f.writelines(line)
             f.write('\n')
 
 elif args.name=='valid':
-    valid_final_data = final_process(valid_inter_data, user_vocab, 'reco', train_inter_data['i_id'], False)
+    valid_final_data = final_process(valid_inter_data_dict, user_vocab, 'reco', train_inter_data_dict['i_id'], False)
     with open(os.path.join(root_data_path, "valid_final_data.txt"), 'w') as f:
         for line in valid_final_data:
             f.writelines(line)
