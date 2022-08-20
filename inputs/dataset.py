@@ -2,7 +2,7 @@
 import _pickle as cPickle
 import copy
 import json
-import pickle
+import pickle5 as pickle
 import logging
 from bz2 import BZ2File
 import numpy as np
