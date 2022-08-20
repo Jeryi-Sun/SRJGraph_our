@@ -163,7 +163,7 @@ class Dataset():
 
                 if len(data) >= self.batch_size * 256:
                     for inputs in data:
-                        if sum(inputs[4]) > 0: # query_split
+                        if sum(inputs[10]) > 0: # query_split
                             raw_features_search = self.update_raw_features(raw_features_search, inputs)
                         else:
                             raw_features_recommend = self.update_raw_features(raw_features_recommend, inputs)
