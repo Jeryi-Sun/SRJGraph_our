@@ -41,7 +41,7 @@ class Dataset():
         self.test_files = test_files
         self.features = features
         self.need_neighbor = need_neighbor
-        self.user_feat_table, self.item_feat_table, self.i_id_vocab, self.u_id_vocab = self.load_feat_tables()
+        self.user_feat_table, self.item_feat_table, self.i_id_vocab, self.u_id_vocab, self.user_feat_table_str, self.item_feat_table_str = self.load_feat_tables()
         self.logger.info('Loading graph and feature tables done.')
 
     def load_feat_tables(self):
@@ -49,7 +49,9 @@ class Dataset():
         item_feat_table = cPickle.load(open(self.args.item_feat_table_path, 'rb'))
         i_id_vocab = cPickle.load(open((self.args.i_id_vocab_path), 'rb'))
         u_id_vocab = cPickle.load(open((self.args.u_id_vocab_path), 'rb'))
-        return user_feat_table, item_feat_table, i_id_vocab, u_id_vocab
+        user_feat_table_str = cPickle.load(open(self.args.user_feat_table_str_path, 'rb'))
+        item_feat_table_str = cPickle.load(open(self.args.item_feat_table_str_path, 'rb'))
+        return user_feat_table, item_feat_table, i_id_vocab, u_id_vocab, user_feat_table_str, item_feat_table_str
 
     def get_mini_batch(self, mode):
         if mode == 'train':
@@ -106,24 +108,25 @@ class Dataset():
                 # else:
                 ## 先切分inter 再去找user 与 item 对应的特征 然后切分
                 arr = line.strip('\n').split('\t')
-                user_id, user_sex, user_age, user_search_active = arr[0:4]
-                item_id, _, item_category, item_author_id, item_photo_len, item_upload_type= arr[4:10]
-                query = arr[10]
-                label = arr[11]
+                user_id, item_id, query, label = arr
+                user_id, item_id, label = map(int, map(float, [user_id, item_id, label]))
+                user_arr = self.user_feat_table_str[user_id].strip('\n').split('\t')
+                item_arr = self.item_feat_table_str[item_id].strip('\n').split('\t')
 
-                user_id, user_sex, user_age, user_search_active, item_id, item_category, item_author_id, item_photo_len, item_upload_type, label  = \
-                    map(int, map(float, [user_id, user_sex, user_age, user_search_active, item_id, item_category, item_author_id, item_photo_len, item_upload_type, label]))
+                user_sex, user_age, user_search_active = user_arr[:3]
+                _, item_category, item_author_id, item_photo_len, item_upload_type= item_arr[:5]
+
+                user_sex, user_age, user_search_active, item_category, item_author_id, item_photo_len, item_upload_type  = \
+                    map(int, map(float, [user_sex, user_age, user_search_active, item_category, item_author_id, item_photo_len, item_upload_type]))
                 user_id = self.u_id_vocab[user_id]
                 item_id = self.i_id_vocab[item_id]
                 query_split, query_len = split_list(query, self.max_q_len)
                 inputs = [user_id, user_sex, user_age, user_search_active, item_id, item_category, item_author_id, item_photo_len, item_upload_type, label,
                           query_split]
                 if self.need_neighbor:
-                    assert len(arr) == 24
-                    ui, uiu, uiui = arr[12:15]
-                    ui_query, uiu_query, uiui_query = arr[15:18]
-                    iu, iui, iuiu = arr[18:21]
-                    iu_query, iui_query, iuiu_query = arr[21:24]
+                    assert len(user_arr) == 9 and len(item_arr)==11
+                    ui, uiu, uiui, ui_query, uiu_query, uiui_query = user_arr[3:]
+                    iu, iui, iuiu, iu_query, iui_query, iuiu_query  = arr[5:]
 
                     if len(self.user_neighbor_nums) >= 1 and np.prod(self.user_neighbor_nums[:1]) > 0:
                         ui, _ = split_list(ui, np.prod(self.user_neighbor_nums[:1]))
