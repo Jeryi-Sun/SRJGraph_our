@@ -115,7 +115,7 @@ class Dataset():
                     user_id, item_id, query, label = arr
                 except:
                     print(arr)
-                    exit(-1)
+                    continue
                 user_id, item_id, label = map(int, map(float, [user_id, item_id, label]))
                 user_arr = self.user_feat_table_str[user_id].strip('\n').split('\t')
                 item_arr = self.item_feat_table_str[item_id].strip('\n').split('\t')
