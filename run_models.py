@@ -100,9 +100,9 @@ def parse_args():
                                 help='momentum')
     train_settings.add_argument('--dropout_rate', type=float, default=0.0,
                                 help='dropout rate')
-    train_settings.add_argument('--batch_size', type=int, default=128,
+    train_settings.add_argument('--batch_size', type=int, default=1024,
                                 help='batch size')
-    train_settings.add_argument('--train_epoch', type=int, default=1,
+    train_settings.add_argument('--train_epoch', type=int, default=20,
                                 help='number of training epochs')
     train_settings.add_argument('--eval_step', type=int, default=20000,
                                help='the frequency of evaluating on the dev set when training')
