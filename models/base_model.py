@@ -264,7 +264,7 @@ class BaseModel(object):
             x = {}
             for feat in self.feature_columns_dict:
                 x[feat] = mini_batch[feat]
-            y = mini_batch['click'].tolist()
+            y = mini_batch['label'].tolist()
             preds = self.model.predict_on_batch(x).reshape([-1]).tolist()
             if sum(x['query'][0].tolist()) > 0:
                 eval_y_true_search += y
