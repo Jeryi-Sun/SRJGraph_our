@@ -5,7 +5,7 @@ Author:
 """
 import logging
 import os
-
+from tqdm import tqdm
 import numpy as np
 
 import tensorflow as tf
@@ -226,7 +226,7 @@ class BaseModel(object):
         return requested_feature_columns
 
     def train_one_epoch(self):
-        for mini_batch in self.dataset.get_mini_batch('train'):
+        for mini_batch in tqdm(self.dataset.get_mini_batch('train')):
             x = {}
             for feat in self.feature_columns_dict:
                 x[feat] = mini_batch[feat]
@@ -260,7 +260,7 @@ class BaseModel(object):
         rn_search, rn_recommend = [], []
         eval_y_true_search, eval_y_pred_search = [], []
         eval_y_true_recommend, eval_y_pred_recommend = [], []
-        for mini_batch in self.dataset.get_mini_batch('dev'):
+        for mini_batch in tqdm(self.dataset.get_mini_batch('dev')):
             x = {}
             for feat in self.feature_columns_dict:
                 x[feat] = mini_batch[feat]
@@ -317,7 +317,7 @@ class BaseModel(object):
         eval_y_true_search, eval_y_pred_search = [], []
         eval_y_true_recommend, eval_y_pred_recommend = [], []
 
-        for mini_batch in self.dataset.get_mini_batch('test'):
+        for mini_batch in tqdm(self.dataset.get_mini_batch('test')):
             x = {}
             for feat in self.feature_columns_dict:
                 x[feat] = mini_batch[feat]
