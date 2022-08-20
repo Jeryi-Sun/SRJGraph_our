@@ -2,6 +2,7 @@
 import _pickle as cPickle
 import copy
 import json
+import pickle
 import logging
 from bz2 import BZ2File
 import numpy as np
@@ -49,8 +50,10 @@ class Dataset():
         item_feat_table = cPickle.load(open(self.args.item_feat_table_path, 'rb'))
         i_id_vocab = cPickle.load(open((self.args.i_id_vocab_path), 'rb'))
         u_id_vocab = cPickle.load(open((self.args.u_id_vocab_path), 'rb'))
-        user_feat_table_str = cPickle.load(open(self.args.user_feat_table_str_path, 'rb'))
-        item_feat_table_str = cPickle.load(open(self.args.item_feat_table_str_path, 'rb'))
+        with open(self.args.user_feat_table_str_path, 'rb') as f:
+            user_feat_table_str = pickle.load(f)
+        with open(self.args.item_feat_table_str_path, 'rb') as f:
+            item_feat_table_str = pickle.load(f)
         return user_feat_table, item_feat_table, i_id_vocab, u_id_vocab, user_feat_table_str, item_feat_table_str
 
     def get_mini_batch(self, mode):
