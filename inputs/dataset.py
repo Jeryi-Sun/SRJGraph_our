@@ -129,7 +129,7 @@ class Dataset():
                 if self.need_neighbor:
                     assert len(user_arr) == 9 and len(item_arr)==11
                     ui, uiu, uiui, ui_query, uiu_query, uiui_query = user_arr[3:]
-                    iu, iui, iuiu, iu_query, iui_query, iuiu_query  = arr[5:]
+                    iu, iui, iuiu, iu_query, iui_query, iuiu_query  = item_arr[5:]
 
                     if len(self.user_neighbor_nums) >= 1 and np.prod(self.user_neighbor_nums[:1]) > 0:
                         ui, _ = split_list(ui, np.prod(self.user_neighbor_nums[:1]))
