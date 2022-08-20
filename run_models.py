@@ -150,9 +150,9 @@ def parse_args():
     path_settings.add_argument('--item_feat_table_path',
                                default='../reco_search_data/item_vocab.pickle')
     path_settings.add_argument('--user_feat_table_str_path',
-                               default='../reco_search_data/user_features_str.pickl')
+                               default='../reco_search_data/user_features_str.pickle')
     path_settings.add_argument('--item_feat_table_str_path',
-                               default='../reco_search_data/item_features_str.pickl')
+                               default='../reco_search_data/item_features_str.pickle')
     path_settings.add_argument("--i_id_vocab_path",default='../reco_search_data/i_id_vocab.pickle')
     path_settings.add_argument("--u_id_vocab_path",default='../reco_search_data/u_id_vocab.pickle')
     # path_settings.add_argument('--user_cate_item_table_path',
