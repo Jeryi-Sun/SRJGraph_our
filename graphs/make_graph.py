@@ -55,7 +55,7 @@ def final_process(inter_data, user_vocab, reco_or_search, items_with_pops, sampl
             if reco_or_search=='reco':
                 neg_items = gen_neg_samples(items_with_pops, item_id, user_vocab[user_id]['rec_his'], 4)
             else:
-                neg_items = gen_neg_samples(items_with_pops, item_id, user_vocab[user_id]['click_items'], 4)
+                neg_items = gen_neg_samples(items_with_pops, item_id, user_vocab[user_id]['click_items']+user_vocab[user_id]['rec_his'], 4)
             for n in neg_items:
                 final_data.append("\t".join([str(user_id), str(n), '', str(0.0)]))
     return final_data
