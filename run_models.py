@@ -126,13 +126,13 @@ def parse_args():
     path_settings = parser.add_argument_group('path settings')
 
     path_settings.add_argument('--train_files', nargs='+',
-                               default=['./dataset/train_data.txt'],
+                               default=['../../reco_search_data/train_final_data.txt'],
                                help='list of files that contain the preprocessed train data')
     path_settings.add_argument('--dev_files', nargs='+',
-                               default=['./dataset/train_data.txt'],
+                               default=['../../reco_search_data/valid_final_data.txt'],
                                help='list of files that contain the preprocessed dev data')
     path_settings.add_argument('--test_files', nargs='+',
-                               default=['./dataset/train_data.txt'],
+                               default=['../../reco_search_data/test_final_data.txt'],
                                help='list of files that contain the preprocessed test data')
 
     # path_settings.add_argument('--train_files', nargs='+',
@@ -146,11 +146,15 @@ def parse_args():
     #                            help='list of files that contain the preprocessed test data')
 
     path_settings.add_argument('--user_feat_table_path',
-                               default='./dataset/user_vocab.pickle')
+                               default='../../reco_search_data/user_vocab.pickle')
     path_settings.add_argument('--item_feat_table_path',
-                               default='./dataset/item_vocab.pickle')
-    path_settings.add_argument("--i_id_vocab_path",default='./dataset/i_id_vocab.pickle')
-    path_settings.add_argument("--u_id_vocab_path",default='./dataset/u_id_vocab.pickle')
+                               default='../../reco_search_data/item_vocab.pickle')
+    path_settings.add_argument('--user_feat_table_str_path',
+                               default='../../reco_search_data/user_features_str.pickl')
+    path_settings.add_argument('--item_feat_table_str_path',
+                               default='../../reco_search_data/item_features_str.pickl')
+    path_settings.add_argument("--i_id_vocab_path",default='../../reco_search_data/i_id_vocab.pickle')
+    path_settings.add_argument("--u_id_vocab_path",default='../../reco_search_data/u_id_vocab.pickle')
     # path_settings.add_argument('--user_cate_item_table_path',
     #                            default='./dataset/dataset_0929/user_cate_item_table_all.pkl')
     # path_settings.add_argument('--item_user_table_path',
