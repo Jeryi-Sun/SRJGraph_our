@@ -5,7 +5,7 @@ import pandas as pd
 import os
 import pickle
 
-root_data_path = '../dataset/'
+root_data_path = '../../reco_search_data/'
 def gen_neg_samples(items_with_popular, postive_item, user_rec_his, num_negs):
     count = 0
     neg_items = []
@@ -60,10 +60,10 @@ def final_process(inter_data, user_vocab, reco_or_search, items_with_pops, sampl
                 final_data.append("\t".join([str(user_id), str(n), '', str(0.0)]))
     return final_data
 
-train_inter_data = pd.read_csv(os.path.join(root_data_path, 'dataset/train_inter.tsv'), sep='\t')
+train_inter_data = pd.read_csv(os.path.join(root_data_path, 'train_inter.tsv'), sep='\t')
 train_inter_data[['ts', 'i_id']] = train_inter_data[['ts', 'i_id']].astype(np.int64)
 train_inter_data_dict = train_inter_data.to_dict('list')
-train_src_inter_all = pd.read_csv(os.path.join(root_data_path, 'dataset/train_src_inter_all.tsv'), sep='\t').to_dict('list')
+train_src_inter_all = pd.read_csv(os.path.join(root_data_path, 'train_src_inter_all.tsv'), sep='\t').to_dict('list')
 train_inter_src_data =  {'u_id':[], 'i_id':[], 'label':[], 'query':[]}
 for i in range(len(train_src_inter_all['user_id'])):
     for item in eval(train_src_inter_all['click_items'][i]):
@@ -72,16 +72,16 @@ for i in range(len(train_src_inter_all['user_id'])):
         train_inter_src_data['query'].append(eval(train_src_inter_all['keyword_seg'][i]))
         train_inter_src_data['label'].append(1.0)
 
-test_inter_data = pd.read_csv(os.path.join(root_data_path, 'dataset/test_inter.tsv'), sep='\t')
+test_inter_data = pd.read_csv(os.path.join(root_data_path, 'test_inter.tsv'), sep='\t')
 test_inter_data[['ts', 'i_id']] = test_inter_data[['ts', 'i_id']].astype(np.int64)
 
-valid_inter_data = pd.read_csv(os.path.join(root_data_path, 'dataset/valid_inter.tsv'), sep='\t')
+valid_inter_data = pd.read_csv(os.path.join(root_data_path, 'valid_inter.tsv'), sep='\t')
 valid_inter_data[['ts', 'i_id']] = valid_inter_data[['ts', 'i_id']].astype(np.int64)
 
-with open(os.path.join(root_data_path, 'vocab/s_session_vocab.pickle'), 'rb') as f:
+with open(os.path.join(root_data_path, 's_session_vocab.pickle'), 'rb') as f:
     s_session_vocab = pickle.load(f)
 
-with open(os.path.join(root_data_path, "vocab/user_vocab.pickle"), 'rb') as f:
+with open(os.path.join(root_data_path, "user_vocab.pickle"), 'rb') as f:
     user_vocab = pickle.load(f)
 
 for k in user_vocab.keys():
@@ -93,7 +93,7 @@ train_final_data_reco = final_process(train_inter_data, user_vocab, 'reco', trai
 #train_final_data_src = final_process(train_inter_src_data, user_vocab, 'search', train_inter_data['i_id'], True)
 #test_final_data = final_process(test_inter_src_data, user_vocab, 'reco', train_inter_data['i_id'], False)
 #valid_final_data = final_process(valid_inter_src_data, user_vocab, 'reco', train_inter_data['i_id'], False)
-with open(os.path.join(root_data_path, "dataset/train_data_reco.txt"), 'w') as f:
+with open(os.path.join(root_data_path, "train_data_reco.txt"), 'w') as f:
     for line in train_final_data_reco:
         f.writelines(line)
         f.write('\n')
