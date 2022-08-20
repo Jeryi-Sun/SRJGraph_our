@@ -9,7 +9,6 @@ for file_name in data_path:
 
 with open(os.path.join(root_data_path, "train_final_data.txt"), 'w') as f:
     for line in all_train_data:
-        f.writelines(line)
-        f.write('\n')            
+        f.writelines(line)           
  
 
