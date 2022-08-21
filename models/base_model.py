@@ -277,13 +277,13 @@ class BaseModel(object):
             if sum(x['query'][0].tolist()) > 0:
                 eval_y_true_search += y
                 eval_y_pred_search += preds
-                for info, user, item in zip(mini_batch['info'], mini_batch['user_id'].tolist(), mini_batch['item_id'].tolist()):
-                    rn_search.append([info['rn'], user, item])
+                for user, item in zip(mini_batch['user_id'].tolist(), mini_batch['item_id'].tolist()):
+                    rn_search.append([user, item])
             else:
                 eval_y_true_recommend += y
                 eval_y_pred_recommend += preds
-                for info, user, item in zip(mini_batch['info'], mini_batch['user_id'].tolist(), mini_batch['item_id'].tolist()):
-                    rn_recommend.append([info['rn'], user, item])
+                for user, item in zip(mini_batch['user_id'].tolist(), mini_batch['item_id'].tolist()):
+                    rn_recommend.append([user, item])
 
         best_tag = False
         if len(eval_y_true_recommend) > 0:
