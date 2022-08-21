@@ -235,7 +235,7 @@ class BaseModel(object):
             for feat in self.feature_columns_dict:
                 x[feat] = mini_batch[feat]
             y = mini_batch['label']
-            print('process time cost',time_end_2-time_end_1,'s') 
+            #print('process time cost',time_end_2-time_end_1,'s') 
             train_loss = self.model.train_on_batch(x, y)
             self.global_step += 1
             #time_end_3 = time.time()
