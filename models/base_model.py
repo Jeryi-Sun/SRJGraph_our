@@ -247,9 +247,9 @@ class BaseModel(object):
             if self.global_step % self.save_step == 0:
                 self.save_model()
             if self.current_patience == 0:
-                break
-            print('else time cost',time_start-time_end_3,'s')  
+                break             
             time_start=time.time()
+            print('else time cost',time_start-time_end_3,'s') 
 
     def train(self):
         self.logger.info('Training...')
