@@ -364,6 +364,6 @@ class BaseModel(object):
             os.mkdir(out_dir)
         out = open(os.path.join(out_dir, result_file), 'w')
         for _rn, y_t, y_p in zip(rn, y_true, y_pred):
-            pv_id, user, item = _rn
-            out.write('{}\t{}\t{}\t{}\t{}\n'.format(pv_id, user, item, y_t, y_p))
+            user, item = _rn
+            out.write('{}\t{}\t{}\t{}\n'.format(user, item, y_t, y_p))
         out.close()
