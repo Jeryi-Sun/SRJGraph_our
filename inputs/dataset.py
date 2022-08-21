@@ -89,14 +89,14 @@ class Dataset():
         #                     'iuiu_gender', 'iuiu_age',
         #                     'iuiui_brand', 'iuiui_seller', 'iuiui_cate', 'iuiui_cate_level1', 'iuiui_price']
         columns = ['task', 'user_id', 'user_sex', 'user_age', 'user_search_active', 'item_id',
-                    'item_category', 'item_author_id', 'item_photo_len', 'item_upload_type', 'query', 'label']
+                    'item_category', 'item_upload_type', 'query', 'label']
         neighbor_colunms = ['ui', 'uiu', 'uiui', 'ui_query', 'uiu_query', 'uiui_query',
-                             'ui_category', 'ui_author_id', 'ui_photo_len', 'ui_upload_type',
+                             'ui_category', 'ui_upload_type',
                             'uiu_sex', 'uiu_age', 'uiu_search_active',
-                             'uiui_category', 'uiui_author_id', 'uiui_photo_len', 'uiui_upload_type',
+                             'uiui_category', 'uiui_upload_type',
                             'iu', 'iui', 'iuiu', 'iu_query', 'iui_query', 'iuiu_query',
                             'iu_sex', 'iu_age', 'iu_search_active',
-                             'iui_category', 'iui_author_id', 'iui_photo_len', 'iui_upload_type',
+                             'iui_category', 'iui_upload_type',
                             'iuiu_sex', 'iuiu_age', 'iuiu_search_active']
         if not self.need_neighbor:
             neighbor_colunms = []
@@ -241,8 +241,6 @@ class Dataset():
 
         raw_features['item_id'].append(inputs[4])
         raw_features['item_category'].append(inputs[5]),
-        raw_features['item_author_id'].append(inputs[6])
-        raw_features['item_photo_len'].append(inputs[7])
         raw_features['item_upload_type'].append(inputs[8])
 
         raw_features['query'].append(inputs[10])
@@ -254,8 +252,6 @@ class Dataset():
                 raw_features['ui'].append([self.i_id_vocab[i] if i else i for i in inputs[11]])
                 raw_features['ui_query'].append(inputs[14])
                 raw_features['ui_category'].append([self.item_feat_table[x]['cate'] if x else 0 for x in inputs[11]])
-                raw_features['ui_author_id'].append([self.item_feat_table[x]['aut_id'] if x else 0 for x in inputs[11]])
-                raw_features['ui_photo_len'].append([self.item_feat_table[x]['len_type'] if x else 0 for x in inputs[11]])
                 raw_features['ui_upload_type'].append([self.item_feat_table[x]['type1'] if x else 0 for x in inputs[11]])
 
             if len(self.user_neighbor_nums) >= 2 and np.prod(self.user_neighbor_nums[:2]) > 0:
@@ -269,8 +265,6 @@ class Dataset():
                 raw_features['uiui'].append([self.i_id_vocab[i] if i else i for i in inputs[13]])
                 raw_features['uiui_query'].append(inputs[16])
                 raw_features['uiui_category'].append([self.item_feat_table[x]['cate'] if x else 0 for x in inputs[13]])
-                raw_features['uiui_author_id'].append([self.item_feat_table[x]['aut_id'] if x else 0 for x in inputs[13]])
-                raw_features['uiui_photo_len'].append([self.item_feat_table[x]['len_type'] if x else 0 for x in inputs[13]])
                 raw_features['uiui_upload_type'].append([self.item_feat_table[x]['type1'] if x else 0 for x in inputs[13]])
 
 
@@ -285,8 +279,6 @@ class Dataset():
                 raw_features['iui'].append([self.i_id_vocab[i] if i else i for i in inputs[18]])
                 raw_features['iui_query'].append(inputs[21])
                 raw_features['iui_category'].append([self.item_feat_table[x]['cate'] if x else 0 for x in inputs[18]])
-                raw_features['iui_author_id'].append([self.item_feat_table[x]['aut_id'] if x else 0 for x in inputs[18]])
-                raw_features['iui_photo_len'].append([self.item_feat_table[x]['len_type'] if x else 0 for x in inputs[18]])
                 raw_features['iui_upload_type'].append([self.item_feat_table[x]['type1'] if x else 0 for x in inputs[18]])
 
             if len(self.item_neighbor_nums) >= 3 and np.prod(self.item_neighbor_nums[:3]) > 0:
