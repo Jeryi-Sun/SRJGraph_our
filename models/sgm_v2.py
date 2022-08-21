@@ -19,7 +19,7 @@ from layers.layers import Transformer, AggregationLayerV2
 class SGM_v2(BaseModel):
     def __init__(self, args):
         super(SGM_v2, self).__init__(args)
-        self.need_neighbors = True
+        self.need_neighbors = False
         self.column_groups = {'user': ['user_id', 'user_sex', 'user_age', 'user_search_active'],
                               'query': ['query'],
                               'item': ['item_id', 'item_category', 'item_upload_type']}
