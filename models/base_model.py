@@ -7,7 +7,7 @@ import logging
 import os
 from tqdm import tqdm
 import numpy as np
-
+import time
 import tensorflow as tf
 from sklearn.metrics import roc_auc_score, log_loss
 from tensorboardX import SummaryWriter
@@ -226,14 +226,20 @@ class BaseModel(object):
         return requested_feature_columns
 
     def train_one_epoch(self):
+        time_start=time.time()
         for mini_batch in tqdm(self.dataset.get_mini_batch('train')):
+            time_end_1=time.time()
+            print('read time cost',time_end_1-time_start,'s') 
             x = {}
+            time_end_2 = time.time()
             for feat in self.feature_columns_dict:
                 x[feat] = mini_batch[feat]
             y = mini_batch['label']
+            print('process time cost',time_end_2-time_end_1,'s') 
             train_loss = self.model.train_on_batch(x, y)
             self.global_step += 1
-
+            time_end_3 = time.time()
+            print('model time cost',time_end_3-time_end_2,'s')  
             data_type = 'search' if sum(x['query'][0].tolist()) > 0 else 'recommend'
             self.writer.add_scalar('train/loss_{}'.format(data_type), train_loss, self.global_step)
             if self.global_step % self.eval_step == 0:
@@ -242,6 +248,8 @@ class BaseModel(object):
                 self.save_model()
             if self.current_patience == 0:
                 break
+            print('else time cost',time_start-time_end_3,'s')  
+            time_start=time.time()
 
     def train(self):
         self.logger.info('Training...')
