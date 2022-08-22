@@ -267,6 +267,7 @@ class BaseModel(object):
         self.logger.info('Evaluating...')
         #rn_search, rn_recommend = [], []
         rn = []
+        group_size = 100
         eval_y_true, eval_y_pred = [], []
         group_preds, group_labels = [], [] 
         # eval_y_true_search, eval_y_pred_search = [], []
