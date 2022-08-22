@@ -304,10 +304,10 @@ class BaseModel(object):
             group_preds, group_labels, ['ndcg@5;10', 'hit@1;5;10','mrr'])
             self.logger.info('global_step: {}, dev/loss: {}, dev/auc: {}, dev/ndcg@5: {}, dev/ndcg@10: {}, dev/hit@1: {},  \
                 dev/hit@5: {}, dev/hit@10: {}, dev/mrr: {}'.format(self.global_step, eval_loss, eval_auc_recommend, res_pairwise["ndcg@5"], res_pairwise["ndcg@10"], 
-                res_pairwise["hit@1"], res_pairwise["hit@5"], res_pairwise["mrr"]))
+                res_pairwise["hit@1"], res_pairwise["hit@5"], res_pairwise["hit@10"], res_pairwise["mrr"]))
             print('global_step: {}, dev/loss: {}, dev/auc: {}, dev/ndcg@5: {}, dev/ndcg@10: {}, dev/hit@1: {},  \
                 dev/hit@5: {}, dev/hit@10: {}, dev/mrr: {}'.format(self.global_step, eval_loss, eval_auc_recommend, res_pairwise["ndcg@5"], res_pairwise["ndcg@10"], 
-                res_pairwise["hit@1"], res_pairwise["hit@5"], res_pairwise["mrr"]))
+                res_pairwise["hit@1"], res_pairwise["hit@5"], res_pairwise["hit@10"], res_pairwise["mrr"]))
             self.writer.add_scalar('dev/loss', eval_loss, self.global_step)
             self.writer.add_scalar('dev/auc', eval_auc_recommend, self.global_step)
             self.save_results(rn, eval_y_true, eval_y_pred, 'predict_{}.txt'.format(self.global_step))
@@ -379,15 +379,12 @@ class BaseModel(object):
             eval_auc = roc_auc_score(eval_y_true, eval_y_pred)
             res_pairwise = self.judger.cal_metric(
             group_preds, group_labels, ['ndcg@5;10', 'hit@1;5;10','mrr'])
-            print(res_pairwise)
-            res_pairwise["ndcg@5"], res_pairwise["ndcg@10"] 
-            res_pairwise["hit@1"], res_pairwise["hit@5"], res_pairwise["mrr"]
             self.logger.info('global_step: {}, test/loss: {}, test/auc: {}, test/ndcg@5: {}, test/ndcg@10: {}, test/hit@1: {},  \
                 test/hit@5: {}, test/hit@10: {}, test/mrr: {}'.format(self.global_step, eval_loss, eval_auc, res_pairwise["ndcg@5"], res_pairwise["ndcg@10"], 
-                res_pairwise["hit@1"], res_pairwise["hit@5"], res_pairwise["mrr"]))
+                res_pairwise["hit@1"], res_pairwise["hit@5"], res_pairwise["hit@10"], res_pairwise["mrr"]))
             print('global_step: {}, test/loss: {}, test/auc: {}, test/ndcg@5: {}, test/ndcg@10: {}, test/hit@1: {},  \
                 test/hit@5: {}, test/hit@10: {}, test/mrr: {}'.format(self.global_step, eval_loss, eval_auc, res_pairwise["ndcg@5"], res_pairwise["ndcg@10"], 
-                res_pairwise["hit@1"], res_pairwise["hit@5"], res_pairwise["mrr"]))
+                res_pairwise["hit@1"], res_pairwise["hit@5"], res_pairwise["hit@10"], res_pairwise["mrr"]))
             self.writer.add_scalar('test/loss', eval_loss, self.global_step)
             self.writer.add_scalar('test/auc', eval_auc, self.global_step)
             self.save_results(rn, eval_y_true, eval_y_pred, 'predict_{}.txt'.format(self.global_step))
