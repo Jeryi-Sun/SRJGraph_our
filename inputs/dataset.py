@@ -62,10 +62,10 @@ class Dataset():
             batch_size = self.batch_size
         elif mode == 'dev':
             data_files = self.dev_files
-            batch_size = self.batch_size * 8
+            batch_size = 10000
         elif mode == 'test':
             data_files = self.test_files
-            batch_size = self.batch_size * 8
+            batch_size = 10000
         else:
             raise Exception('Invalid mode when getting data samples:', mode)
 

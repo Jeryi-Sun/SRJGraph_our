@@ -20,7 +20,7 @@ from deepctr.inputs import create_embedding_matrix, embedding_lookup
 from deepctr.layers import DNN, PredictionLayer
 from inputs.features_columns import get_all_feature_columns
 from layers.layers import Transformer
-
+from utils.metrics import judger as judge
 
 class BaseModel(object):
     def __init__(self, args):
@@ -75,7 +75,7 @@ class BaseModel(object):
         self.current_patience = args.patience
         self.dnn_hidden_units = args.hidden_size
         self.learning_rate = args.learning_rate
-
+        self.judger = judge()
         self.column_groups = None
         self.feature_columns_dict = None
         self.features = None
@@ -265,35 +265,52 @@ class BaseModel(object):
 
     def evaluate(self, predict_tag=False):
         self.logger.info('Evaluating...')
-        rn_search, rn_recommend = [], []
-        eval_y_true_search, eval_y_pred_search = [], []
-        eval_y_true_recommend, eval_y_pred_recommend = [], []
+        #rn_search, rn_recommend = [], []
+        rn = []
+        eval_y_true, eval_y_pred = [], []
+        group_preds, group_labels = [], [] 
+        # eval_y_true_search, eval_y_pred_search = [], []
+        # eval_y_true_recommend, eval_y_pred_recommend = [], []
         for mini_batch in tqdm(self.dataset.get_mini_batch('dev')):
             x = {}
             for feat in self.feature_columns_dict:
                 x[feat] = mini_batch[feat]
             y = mini_batch['label'].tolist()
             preds = self.model.predict_on_batch(x).reshape([-1]).tolist()
-            if sum(x['query'][0].tolist()) > 0:
-                eval_y_true_search += y
-                eval_y_pred_search += preds
-                for user, item in zip(mini_batch['user_id'].tolist(), mini_batch['item_id'].tolist()):
-                    rn_search.append([user, item])
-            else:
-                eval_y_true_recommend += y
-                eval_y_pred_recommend += preds
-                for user, item in zip(mini_batch['user_id'].tolist(), mini_batch['item_id'].tolist()):
-                    rn_recommend.append([user, item])
+            eval_y_true += y
+            eval_y_pred += preds
+            group_preds.extend(np.reshape(preds, (-1, group_size)))
+            group_labels.extend(np.reshape(y, (-1, group_size)))
+            for user, item in zip(mini_batch['user_id'].tolist(), mini_batch['item_id'].tolist()):
+                rn.append([user, item])
+            
+            # if sum(x['query'][0].tolist()) > 0:
+            #     eval_y_true_search += y
+            #     eval_y_pred_search += preds
+            #     for user, item in zip(mini_batch['user_id'].tolist(), mini_batch['item_id'].tolist()):
+            #         rn_search.append([user, item])
+            # else:
+            #     eval_y_true_recommend += y
+            #     eval_y_pred_recommend += preds
+            #     for user, item in zip(mini_batch['user_id'].tolist(), mini_batch['item_id'].tolist()):
+            #         rn_recommend.append([user, item])
 
         best_tag = False
-        if len(eval_y_true_recommend) > 0:
-            eval_loss_recommend = log_loss(eval_y_true_recommend, eval_y_pred_recommend, eps=1e-8, labels=[0, 1])
-            eval_auc_recommend = roc_auc_score(eval_y_true_recommend, eval_y_pred_recommend)
-            self.logger.info(
-                'global_step: {}, dev/loss_recommend: {}, dev/auc_recommend: {}'.format(self.global_step, eval_loss_recommend, eval_auc_recommend))
-            self.writer.add_scalar('dev/loss_recommend', eval_loss_recommend, self.global_step)
-            self.writer.add_scalar('dev/auc_recommend', eval_auc_recommend, self.global_step)
-            self.save_results(rn_recommend, eval_y_true_recommend, eval_y_pred_recommend, 'dev_recommend_{}.txt'.format(self.global_step))
+
+        if len(eval_y_true) > 0:
+            eval_loss = log_loss(eval_y_true, eval_y_pred, eps=1e-8, labels=[0, 1])
+            eval_auc_recommend = roc_auc_score(eval_y_true, eval_y_pred)
+            res_pairwise = self.judger.cal_metric(
+            group_preds, group_labels, ['ndcg@5;10', 'hit@1;5;10','mrr'])
+            self.logger.info('global_step: {}, dev/loss: {}, dev/auc: {}, dev/ndcg@5: {}, dev/ndcg@5: {}, dev/hit@1: {},  \
+                dev/hit@5: {}, dev/hit@10: {}, dev/mrr: {}'.format(self.global_step, eval_loss, eval_auc_recommend, res_pairwise["ndcg@5"], res_pairwise["ndcg@10"], 
+                res_pairwise["hit@1"], res_pairwise["hit@5"], res_pairwise["mrr"]))
+            print('global_step: {}, dev/loss: {}, dev/auc: {}, dev/ndcg@5: {}, dev/ndcg@5: {}, dev/hit@1: {},  \
+                dev/hit@5: {}, dev/hit@10: {}, dev/mrr: {}'.format(self.global_step, eval_loss, eval_auc_recommend, res_pairwise["ndcg@5"], res_pairwise["ndcg@10"], 
+                res_pairwise["hit@1"], res_pairwise["hit@5"], res_pairwise["mrr"]))
+            self.writer.add_scalar('dev/loss', eval_loss, self.global_step)
+            self.writer.add_scalar('dev/auc', eval_auc_recommend, self.global_step)
+            self.save_results(rn, eval_y_true, eval_y_pred, 'predict_{}.txt'.format(self.global_step))
             if eval_auc_recommend > self.best_eval_auc_recommend:
                 self.best_eval_auc_recommend = eval_auc_recommend
                 self.current_patience = self.patience
@@ -301,62 +318,103 @@ class BaseModel(object):
             else:
                 self.current_patience -= 1
 
-        if len(eval_y_true_search) > 0:
-            eval_loss_search = log_loss(eval_y_true_search, eval_y_pred_search, eps=1e-8, labels=[0, 1])
-            eval_auc_search = roc_auc_score(eval_y_true_search, eval_y_pred_search)
-            self.logger.info('global_step: {}, dev/loss_search: {}, dev/auc_search: {}'.format(self.global_step, eval_loss_search, eval_auc_search))
-            self.writer.add_scalar('dev/loss_search', eval_loss_search, self.global_step)
-            self.writer.add_scalar('dev/auc_search', eval_auc_search, self.global_step)
-            self.save_results(rn_search, eval_y_true_search, eval_y_pred_search, 'dev_search_{}.txt'.format(self.global_step))
+        # if len(eval_y_true_recommend) > 0:
+        #     eval_loss_recommend = log_loss(eval_y_true_recommend, eval_y_pred_recommend, eps=1e-8, labels=[0, 1])
+        #     eval_auc_recommend = roc_auc_score(eval_y_true_recommend, eval_y_pred_recommend)
+        #     self.logger.info(
+        #         'global_step: {}, dev/loss_recommend: {}, dev/auc_recommend: {}'.format(self.global_step, eval_loss_recommend, eval_auc_recommend))
+        #     self.writer.add_scalar('dev/loss_recommend', eval_loss_recommend, self.global_step)
+        #     self.writer.add_scalar('dev/auc_recommend', eval_auc_recommend, self.global_step)
+        #     self.save_results(rn_recommend, eval_y_true_recommend, eval_y_pred_recommend, 'dev_recommend_{}.txt'.format(self.global_step))
+        #     if eval_auc_recommend > self.best_eval_auc_recommend:
+        #         self.best_eval_auc_recommend = eval_auc_recommend
+        #         self.current_patience = self.patience
+        #         best_tag = True
+        #     else:
+        #         self.current_patience -= 1
 
-            if eval_auc_search > self.best_eval_auc_search:
-                self.best_eval_auc_search = eval_auc_search
-                self.current_patience = self.patience
-                best_tag = True
-            else:
-                self.current_patience -= 1
+        # if len(eval_y_true_search) > 0:
+        #     eval_loss_search = log_loss(eval_y_true_search, eval_y_pred_search, eps=1e-8, labels=[0, 1])
+        #     eval_auc_search = roc_auc_score(eval_y_true_search, eval_y_pred_search)
+        #     self.logger.info('global_step: {}, dev/loss_search: {}, dev/auc_search: {}'.format(self.global_step, eval_loss_search, eval_auc_search))
+        #     self.writer.add_scalar('dev/loss_search', eval_loss_search, self.global_step)
+        #     self.writer.add_scalar('dev/auc_search', eval_auc_search, self.global_step)
+        #     self.save_results(rn_search, eval_y_true_search, eval_y_pred_search, 'dev_search_{}.txt'.format(self.global_step))
+
+        #     if eval_auc_search > self.best_eval_auc_search:
+        #         self.best_eval_auc_search = eval_auc_search
+        #         self.current_patience = self.patience
+        #         best_tag = True
+        #     else:
+        #         self.current_patience -= 1
 
         if predict_tag and best_tag and self.args.test_files:
             self.predict()
 
     def predict(self):
         self.logger.info('Predicting...')
-        rn_search, rn_recommend = [], []
-        eval_y_true_search, eval_y_pred_search = [], []
-        eval_y_true_recommend, eval_y_pred_recommend = [], []
-
+        rn = []
+        group_size = 100
+        # rn_search, rn_recommend = [], []
+        # eval_y_true_search, eval_y_pred_search = [], []
+        # eval_y_true_recommend, eval_y_pred_recommend = [], []
+        eval_y_true, eval_y_pred = [], [] 
+        group_preds, group_labels = [], [] 
         for mini_batch in tqdm(self.dataset.get_mini_batch('test')):
             x = {}
             for feat in self.feature_columns_dict:
                 x[feat] = mini_batch[feat]
             y = mini_batch['label'].tolist()
             preds = self.model.predict_on_batch(x).reshape([-1]).tolist()
-            if sum(x['query'][0].tolist()) > 0:
-                eval_y_true_search += y
-                eval_y_pred_search += preds
-                for user, item in zip(mini_batch['user_id'].tolist(), mini_batch['item_id'].tolist()):
-                    rn_search.append([user, item])
-            else:
-                eval_y_true_recommend += y
-                eval_y_pred_recommend += preds
-                for user, item in zip( mini_batch['user_id'].tolist(), mini_batch['item_id'].tolist()):
-                    rn_recommend.append([ user, item])
 
-        if len(eval_y_true_recommend) > 0:
-            eval_loss_recommend = log_loss(eval_y_true_recommend, eval_y_pred_recommend, eps=1e-8, labels=[0, 1])
-            eval_auc_recommend = roc_auc_score(eval_y_true_recommend, eval_y_pred_recommend)
-            self.logger.info('global_step: {}, test/loss_recommend: {}, test/auc_recommend: {}'.format(self.global_step, eval_loss_recommend, eval_auc_recommend))
-            self.writer.add_scalar('test/loss_recommend', eval_loss_recommend, self.global_step)
-            self.writer.add_scalar('test/auc_recommend', eval_auc_recommend, self.global_step)
-            self.save_results(rn_recommend, eval_y_true_recommend, eval_y_pred_recommend, 'predict_recommend_{}.txt'.format(self.global_step))
+            eval_y_true += y
+            eval_y_pred += preds
+            group_preds.extend(np.reshape(preds, (-1, group_size)))
+            group_labels.extend(np.reshape(y, (-1, group_size)))
+            for user, item in zip(mini_batch['user_id'].tolist(), mini_batch['item_id'].tolist()):
+                rn.append([user, item])
 
-        if len(eval_y_true_search) > 0:
-            eval_loss_search = log_loss(eval_y_true_search, eval_y_pred_search, eps=1e-8, labels=[0, 1])
-            eval_auc_search = roc_auc_score(eval_y_true_search, eval_y_pred_search)
-            self.logger.info('global_step: {}, test/loss_search: {}, test/auc_search: {}'.format(self.global_step, eval_loss_search, eval_auc_search))
-            self.writer.add_scalar('test/loss_search', eval_loss_search, self.global_step)
-            self.writer.add_scalar('test/auc_search', eval_auc_search, self.global_step)
-            self.save_results(rn_search, eval_y_true_search, eval_y_pred_search, 'predict_search_{}.txt'.format(self.global_step))
+        if len(eval_y_true) > 0:
+            eval_loss = log_loss(eval_y_true, eval_y_pred, eps=1e-8, labels=[0, 1])
+            eval_auc = roc_auc_score(eval_y_true, eval_y_pred)
+            res_pairwise = self.judger.cal_metric(
+            group_preds, group_labels, ['ndcg@5;10', 'hit@1;5;10','mrr'])
+            self.logger.info('global_step: {}, test/loss: {}, test/auc: {}, test/ndcg@5: {}, test/ndcg@5: {}, test/hit@1: {},  \
+                test/hit@5: {}, test/hit@10: {}, test/mrr: {}'.format(self.global_step, eval_loss, eval_auc, res_pairwise["ndcg@5"], res_pairwise["ndcg@10"], 
+                res_pairwise["hit@1"], res_pairwise["hit@5"], res_pairwise["mrr"]))
+            print('global_step: {}, test/loss: {}, test/auc: {}, test/ndcg@5: {}, test/ndcg@5: {}, test/hit@1: {},  \
+                test/hit@5: {}, test/hit@10: {}, test/mrr: {}'.format(self.global_step, eval_loss, eval_auc, res_pairwise["ndcg@5"], res_pairwise["ndcg@10"], 
+                res_pairwise["hit@1"], res_pairwise["hit@5"], res_pairwise["mrr"]))
+            self.writer.add_scalar('test/loss', eval_loss, self.global_step)
+            self.writer.add_scalar('test/auc', eval_auc, self.global_step)
+            self.save_results(rn, eval_y_true, eval_y_pred, 'predict_{}.txt'.format(self.global_step))
+
+            # if sum(x['query'][0].tolist()) > 0:
+            #     eval_y_true_search += y
+            #     eval_y_pred_search += preds
+            #     for user, item in zip(mini_batch['user_id'].tolist(), mini_batch['item_id'].tolist()):
+            #         rn_search.append([user, item])
+            # else:
+            #     eval_y_true_recommend += y
+            #     eval_y_pred_recommend += preds
+            #     for user, item in zip( mini_batch['user_id'].tolist(), mini_batch['item_id'].tolist()):
+            #         rn_recommend.append([ user, item])
+
+        # if len(eval_y_true_recommend) > 0:
+        #     eval_loss_recommend = log_loss(eval_y_true_recommend, eval_y_pred_recommend, eps=1e-8, labels=[0, 1])
+        #     eval_auc_recommend = roc_auc_score(eval_y_true_recommend, eval_y_pred_recommend)
+        #     self.logger.info('global_step: {}, test/loss_recommend: {}, test/auc_recommend: {}'.format(self.global_step, eval_loss_recommend, eval_auc_recommend))
+        #     self.writer.add_scalar('test/loss_recommend', eval_loss_recommend, self.global_step)
+        #     self.writer.add_scalar('test/auc_recommend', eval_auc_recommend, self.global_step)
+        #     self.save_results(rn_recommend, eval_y_true_recommend, eval_y_pred_recommend, 'predict_recommend_{}.txt'.format(self.global_step))
+
+        # if len(eval_y_true_search) > 0:
+        #     eval_loss_search = log_loss(eval_y_true_search, eval_y_pred_search, eps=1e-8, labels=[0, 1])
+        #     eval_auc_search = roc_auc_score(eval_y_true_search, eval_y_pred_search)
+        #     self.logger.info('global_step: {}, test/loss_search: {}, test/auc_search: {}'.format(self.global_step, eval_loss_search, eval_auc_search))
+        #     self.writer.add_scalar('test/loss_search', eval_loss_search, self.global_step)
+        #     self.writer.add_scalar('test/auc_search', eval_auc_search, self.global_step)
+        #     self.save_results(rn_search, eval_y_true_search, eval_y_pred_search, 'predict_search_{}.txt'.format(self.global_step))
 
     def save_results(self, rn, y_true, y_pred, result_file):
         out_dir = os.path.join(self.args.result_dir, self.model_name)
@@ -365,5 +423,5 @@ class BaseModel(object):
         out = open(os.path.join(out_dir, result_file), 'w')
         for _rn, y_t, y_p in zip(rn, y_true, y_pred):
             user, item = _rn
-            out.write('{}\t{}\t{}\t{}\n'.format(user, item, y_t, y_p))
+            out.write('{}\t{}\t{}\t{}\t{}\n'.format(user, item, y_t, y_p))
         out.close()
