@@ -60,18 +60,18 @@ class Dataset():
         self.test_files = test_files
         self.features = features
         self.need_neighbor = need_neighbor
-        self.user_feat_table, self.item_feat_table, self.i_id_vocab, self.u_id_vocab, self.user_feat_table, \
-            self.item_feat_table, self.user_feat_level1, self.user_feat_level2, self.user_feat_level3, self.item_feat_level1, self.item_feat_level2, self.item_feat_level3  = self.load_feat_tables()
+        self.i_id_vocab, self.u_id_vocab, self.user_feat_table_str, \
+            self.item_feat_table_str, self.user_feat_level1, self.user_feat_level2, self.user_feat_level3, self.item_feat_level1, self.item_feat_level2, self.item_feat_level3  = self.load_feat_tables()
         self.logger.info('Loading graph and feature tables done.')
 
     def load_feat_tables(self):
-        user_feat_table = cPickle.load(open(self.args.user_feat_table_path, 'rb'))
-        item_feat_table = cPickle.load(open(self.args.item_feat_table_path, 'rb'))
+        # user_feat_table = cPickle.load(open(self.args.user_feat_table_path, 'rb'))
+        # item_feat_table = cPickle.load(open(self.args.item_feat_table_path, 'rb'))
         i_id_vocab = cPickle.load(open((self.args.i_id_vocab_path), 'rb'))
         u_id_vocab = cPickle.load(open((self.args.u_id_vocab_path), 'rb'))
-        with open(self.args.user_feat_table_path, 'rb') as f:
+        with open(self.args.user_feat_table_str_path, 'rb') as f:
             user_feat_table = pickle.load(f)
-        with open(self.args.item_feat_table_path, 'rb') as f:
+        with open(self.args.item_feat_table_str_path, 'rb') as f:
             item_feat_table = pickle.load(f)
         with open(self.args.user_feat_level1_path, 'rb') as f:
             user_feat_level1 = pickle.load(f)
@@ -85,7 +85,7 @@ class Dataset():
             item_feat_level2 = pickle.load(f)
         with open(self.args.item_feat_level3_path, 'rb') as f:
             item_feat_level3 = pickle.load(f) 
-        return user_feat_table, item_feat_table, i_id_vocab, u_id_vocab, user_feat_table, item_feat_table, user_feat_level1, \
+        return i_id_vocab, u_id_vocab, user_feat_table, item_feat_table, user_feat_level1, \
             user_feat_level2, user_feat_level3, item_feat_level1, item_feat_level2, item_feat_level3 
 
     def get_mini_batch(self, mode):
