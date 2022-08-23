@@ -82,7 +82,7 @@ def parse_args():
                                 help='max term number of query')
     model_settings.add_argument('--max_hist_len', type=int, default=150,
                                 help='max number of docs in a session')
-    model_settings.add_argument('--user_neighbor_nums', nargs='+', type=int, default=[25, 1],
+    model_settings.add_argument('--user_neighbor_nums', nargs='+', type=int, default=[25],
                                 help='define how many neighbors are sampled at the first and second orders')
     model_settings.add_argument('--item_neighbor_nums', nargs='+', type=int, default=[1, 10],
                                 help='define how many neighbors are sampled at the first and second orders')
