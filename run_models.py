@@ -40,11 +40,11 @@ def parse_args():
                                 help='choose the algorithm to use')
     model_settings.add_argument('--model_name', default='search_graph_model',
                                 help='choose the algorithm to use')
-    model_settings.add_argument('--user_embed_size', type=int, default=16,
+    model_settings.add_argument('--user_embed_size', type=int, default=32,
                                 help='size of the embeddings')
-    model_settings.add_argument('--item_embed_size', type=int, default=16,
+    model_settings.add_argument('--item_embed_size', type=int, default=32,
                                 help='size of the embeddings')
-    model_settings.add_argument('--query_embed_size', type=int, default=16,
+    model_settings.add_argument('--query_embed_size', type=int, default=32,
                                 help='size of the embeddings')
     model_settings.add_argument('--user_sex_embed_size', type=int, default=4,
                                 help='size of the embeddings')
@@ -52,11 +52,11 @@ def parse_args():
                                 help='size of the embeddings')
     model_settings.add_argument('--user_search_active_embed_size', type=int, default=4,
                                 help='size of the embeddings')
-    model_settings.add_argument('--item_text_words_embed_size', type=int, default=16,
+    model_settings.add_argument('--item_text_words_embed_size', type=int, default=32,
                                 help='size of the embeddings')
     model_settings.add_argument('--item_category_embed_size', type=int, default=4,
                                 help='size of the embeddings')
-    model_settings.add_argument('--item_author_id_embed_size', type=int, default=16,
+    model_settings.add_argument('--item_author_id_embed_size', type=int, default=32,
                                 help='size of the embeddings')
     model_settings.add_argument('--item_photo_len_embed_size', type=int, default=4,
                                 help='size of the embeddings')
