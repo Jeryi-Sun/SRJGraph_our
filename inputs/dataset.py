@@ -284,6 +284,8 @@ class Dataset():
                 raw_features['ui'].append(inputs[11]) ## 在外部直接转换
 
                 raw_features['ui_query'].append(inputs[14])
+                print("````````", inputs[0], '`````')
+                print(self.user_feat_level1[inputs[0]], '.......')
                 raw_features['ui_category'].append(self.user_feat_level1[inputs[0]][0])
                 raw_features['ui_upload_type'].append(self.user_feat_level1[inputs[0]][1])
 
