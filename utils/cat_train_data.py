@@ -7,7 +7,7 @@ for file_name in data_path:
         for line in f:
             all_train_data.append(line)
 
-with open(os.path.join(root_data_path, "train_final_data.txt"), 'w') as f:
+with open(os.path.join(root_data_path, "train_final_reco_data.txt"), 'w') as f:
     for line in all_train_data:
         f.writelines(line)           
  
