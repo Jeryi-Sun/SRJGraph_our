@@ -157,8 +157,7 @@ class Dataset():
 
                 user_sex, user_age, user_search_active, item_category, item_author_id, item_photo_len, item_upload_type  = \
                     map(int, map(float, [user_sex, user_age, user_search_active, item_category, item_author_id, item_photo_len, item_upload_type]))
-                user_id = self.u_id_vocab[user_id]
-                item_id = self.i_id_vocab[item_id]
+
                 query_split, query_len = split_list_str(query, self.max_q_len)
                 inputs = [user_id, user_sex, user_age, user_search_active, item_id, item_category, item_author_id, item_photo_len, item_upload_type, label,
                           query_split]
@@ -266,12 +265,12 @@ class Dataset():
     def update_raw_features(self, raw_features, inputs):
         assert len(inputs) == 24
         raw_features['task'].append(inputs[23])
-        raw_features['user_id'].append(inputs[0])
+        raw_features['user_id'].append(self.u_id_vocab[inputs[0]])
         raw_features['user_sex'].append(inputs[1])
         raw_features['user_age'].append(inputs[2])
         raw_features['user_search_active'].append(inputs[3])
 
-        raw_features['item_id'].append(inputs[4])
+        raw_features['item_id'].append(self.i_id_vocab[inputs[4]])
         raw_features['item_category'].append(inputs[5]),
         raw_features['item_upload_type'].append(inputs[8])
 
