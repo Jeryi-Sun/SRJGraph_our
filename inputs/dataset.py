@@ -21,7 +21,7 @@ def split_list_query(x, first_len, second_len, first_seg='\x02', second_seg='\x0
     x_split = x[:first_len]
     x_split = x_split + [] * (first_len - len(x_split))
     for _x in x_split:
-        if len(_x.strip()) == 0:
+        if len(_x) == 0:
             _x = [0] * second_len
         else:
             _x = _x[:second_len]
