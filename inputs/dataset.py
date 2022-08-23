@@ -166,25 +166,25 @@ class Dataset():
                     ui, uiu, uiui, ui_query, uiu_query, uiui_query = user_arr[3:]
                     iu, iui, iuiu, iu_query, iui_query, iuiu_query  = item_arr[4:]
 
-                    if len(self.user_neighbor_nums) >= 1 and np.prod(self.user_neighbor_nums[:1]) > 0:
-                        ui, _ = split_list(ui, np.prod(self.user_neighbor_nums[:1]))
-                        ui_query, _ = split_list_query(ui_query, np.prod(self.user_neighbor_nums[:1]), self.max_q_len)
-                    if len(self.user_neighbor_nums) >= 2 and np.prod(self.user_neighbor_nums[:2]) > 0:
-                        uiu, _ = split_list(uiu, np.prod(self.user_neighbor_nums[:2]))
-                        uiu_query, _ = split_list_query(uiu_query, np.prod(self.user_neighbor_nums[:2]), self.max_q_len)
-                    if len(self.user_neighbor_nums) >= 3 and np.prod(self.user_neighbor_nums[:3]) > 0:
-                        uiui, _ = split_list(uiui, np.prod(self.user_neighbor_nums[:3]))
-                        uiui_query, _ = split_list_query(uiui_query, np.prod(self.user_neighbor_nums[:3]), self.max_q_len)
+                    if len(self.user_neighbor_nums) >= 1 and self.user_neighbor_nums[1] > 0:
+                        ui, _ = split_list(ui, self.user_neighbor_nums[1])
+                        ui_query, _ = split_list_query(ui_query, self.user_neighbor_nums[1], self.max_q_len)
+                    if len(self.user_neighbor_nums) >= 2 and self.user_neighbor_nums[2] > 0:
+                        uiu, _ = split_list(uiu, self.user_neighbor_nums[2])
+                        uiu_query, _ = split_list_query(uiu_query, self.user_neighbor_nums[2], self.max_q_len)
+                    if len(self.user_neighbor_nums) >= 3 and self.user_neighbor_nums[3] > 0:
+                        uiui, _ = split_list(uiui, self.user_neighbor_nums[3])
+                        uiui_query, _ = split_list_query(uiui_query, self.user_neighbor_nums[3], self.max_q_len)
 
-                    if len(self.item_neighbor_nums) >= 1 and np.prod(self.item_neighbor_nums[:1]) > 0:
-                        iu, _ = split_list(iu, np.prod(self.item_neighbor_nums[:1]))
-                        iu_query, _ = split_list_query(iu_query, np.prod(self.item_neighbor_nums[:1]), self.max_q_len)
-                    if len(self.item_neighbor_nums) >= 2 and np.prod(self.item_neighbor_nums[:2]) > 0:
-                        iui, _ = split_list(iui, np.prod(self.item_neighbor_nums[:2]))
-                        iui_query, _ = split_list_query(iui_query, np.prod(self.item_neighbor_nums[:2]), self.max_q_len)
-                    if len(self.item_neighbor_nums) >= 3 and np.prod(self.item_neighbor_nums[:3]) > 0:
-                        iuiu, _ = split_list(iuiu, np.prod(self.item_neighbor_nums[:3]))
-                        iuiu_query, _ = split_list_query(iuiu_query, np.prod(self.item_neighbor_nums[:3]), self.max_q_len)
+                    if len(self.item_neighbor_nums) >= 1 and self.item_neighbor_nums[1] > 0:
+                        iu, _ = split_list(iu, self.item_neighbor_nums[1])
+                        iu_query, _ = split_list_query(iu_query, self.item_neighbor_nums[:1], self.max_q_len)
+                    if len(self.item_neighbor_nums) >= 2 and self.item_neighbor_nums[:2] > 0:
+                        iui, _ = split_list(iui, self.item_neighbor_nums[2])
+                        iui_query, _ = split_list_query(iui_query, self.item_neighbor_nums[2], self.max_q_len)
+                    if len(self.item_neighbor_nums) >= 3 and self.item_neighbor_nums[3] > 0:
+                        iuiu, _ = split_list(iuiu, self.item_neighbor_nums[3])
+                        iuiu_query, _ = split_list_query(iuiu_query, self.item_neighbor_nums[3], self.max_q_len)
 
                     inputs += [ui, uiu, uiui, ui_query, uiu_query, uiui_query, iu, iui, iuiu, iu_query, iui_query, iuiu_query]
                 else:
@@ -283,8 +283,6 @@ class Dataset():
                 raw_features['ui'].append(inputs[11]) ## 在外部直接转换
 
                 raw_features['ui_query'].append(inputs[14])
-                print("````````", inputs[0], '`````')
-                print(self.user_feat_level1[inputs[0]], '.......')
                 raw_features['ui_category'].append(self.user_feat_level1[inputs[0]][0])
                 raw_features['ui_upload_type'].append(self.user_feat_level1[inputs[0]][1])
 
