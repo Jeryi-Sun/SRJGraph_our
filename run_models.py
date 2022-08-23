@@ -63,18 +63,18 @@ def parse_args():
     model_settings.add_argument('--item_upload_type_embed_size', type=int, default=4,
                                 help='size of the embeddings')
 
-    model_settings.add_argument('--user_vocab_size', type=int, default=35722)
+    model_settings.add_argument('--user_vocab_size', type=int, default=35723)
     model_settings.add_argument('--item_vocab_size', type=int, default=822833)
     model_settings.add_argument('--query_vocab_size', type=int, default=341914)
-    model_settings.add_argument('--user_sex_vocab_size', type=int, default=3)
-    model_settings.add_argument('--user_age_vocab_size', type=int, default=8)
-    model_settings.add_argument('--user_search_active_vocab_size', type=int, default=4)
+    model_settings.add_argument('--user_sex_vocab_size', type=int, default=4)
+    model_settings.add_argument('--user_age_vocab_size', type=int, default=9)
+    model_settings.add_argument('--user_search_active_vocab_size', type=int, default=5)
 
-    model_settings.add_argument('--item_text_words_vocab_size', type=int, default=37)
-    model_settings.add_argument('--item_category_vocab_size', type=int, default=341913)
-    model_settings.add_argument('--item_author_id_vocab_size', type=int, default=303689)
-    model_settings.add_argument('--item_photo_len_vocab_size', type=int, default=3)
-    model_settings.add_argument('--item_upload_type_vocab_size', type=int, default=38)
+    model_settings.add_argument('--item_text_words_vocab_size', type=int, default=341914)
+    model_settings.add_argument('--item_category_vocab_size', type=int, default=38)
+    model_settings.add_argument('--item_author_id_vocab_size', type=int, default=303690)
+    model_settings.add_argument('--item_photo_len_vocab_size', type=int, default=4)
+    model_settings.add_argument('--item_upload_type_vocab_size', type=int, default=39)
     #model_settings.add_argument('--item_price_vocab_size', type=int, default=101)
 
 
