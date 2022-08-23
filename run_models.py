@@ -155,12 +155,12 @@ def parse_args():
                                default='../reco_search_data/graph_features/item_features.pickle')
     path_settings.add_argument("--i_id_vocab_path",default='../reco_search_data/i_id_vocab.pickle')
     path_settings.add_argument("--u_id_vocab_path",default='../reco_search_data/u_id_vocab.pickle')
-    path_settings.add_argument("--user_feat_level1_path",default='../reco_search_data/graph_features/user_feat_level1.pickle')
-    path_settings.add_argument("--user_feat_level2_path",default='../reco_search_data/graph_features/user_feat_level2.pickle')
-    path_settings.add_argument("--user_feat_level3_path",default='../reco_search_data/graph_features/user_feat_level3.pickle')
-    path_settings.add_argument("--item_feat_level1_path",default='../reco_search_data/graph_features/item_feat_level1.pickle')
-    path_settings.add_argument("--item_feat_level2_path",default='../reco_search_data/graph_features/item_feat_level2.pickle')
-    path_settings.add_argument("--item_feat_level3_path",default='../reco_search_data/graph_features/item_feat_level3.pickle')
+    path_settings.add_argument("--user_feat_level1_path",default='../reco_search_data/graph_features/user_level1_features.pickle')
+    path_settings.add_argument("--user_feat_level2_path",default='../reco_search_data/graph_features/user_level2_features.pickle')
+    path_settings.add_argument("--user_feat_level3_path",default='../reco_search_data/graph_features/user_level3_features.pickle')
+    path_settings.add_argument("--item_feat_level1_path",default='../reco_search_data/graph_features/item_level1_features.pickle')
+    path_settings.add_argument("--item_feat_level2_path",default='../reco_search_data/graph_features/item_level2_features.pickle')
+    path_settings.add_argument("--item_feat_level3_path",default='../reco_search_data/graph_features/item_level3_features.pickle')
 
     # path_settings.add_argument('--user_cate_item_table_path',
     #                            default='./dataset/dataset_0929/user_cate_item_table_all.pkl')
