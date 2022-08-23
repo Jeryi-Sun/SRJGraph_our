@@ -284,42 +284,42 @@ class Dataset():
                 raw_features['ui'].append(inputs[11]) ## 在外部直接转换
 
                 raw_features['ui_query'].append(inputs[14])
-                raw_features['ui_category'].append(self.user_feat_level1[0])
-                raw_features['ui_upload_type'].append(self.user_feat_level1[1])
+                raw_features['ui_category'].append(self.user_feat_level1[inputs[0]][0])
+                raw_features['ui_upload_type'].append(self.user_feat_level1[inputs[0]][1])
 
             if len(self.user_neighbor_nums) >= 2 and np.prod(self.user_neighbor_nums[:2]) > 0:
                 raw_features['uiu'].append(inputs[12])
                 raw_features['uiu_query'].append(inputs[15])
-                raw_features['uiu_sex'].append(self.user_feat_level2[0])
-                raw_features['uiu_age'].append(self.user_feat_level2[1])
-                raw_features["uiu_search_active"].append(self.user_feat_level2[2])
+                raw_features['uiu_sex'].append(self.user_feat_level2[inputs[0]][0])
+                raw_features['uiu_age'].append(self.user_feat_level2[inputs[0]][1])
+                raw_features["uiu_search_active"].append(self.user_feat_level2[inputs[0]][2])
 
             if len(self.user_neighbor_nums) >= 3 and np.prod(self.user_neighbor_nums[:3]) > 0:
                 raw_features['uiui'].append(inputs[13])
                 raw_features['uiui_query'].append(inputs[16])
-                raw_features['uiui_category'].append(self.user_feat_level3[0])
-                raw_features['uiui_upload_type'].append(self.user_feat_level3[1])
+                raw_features['uiui_category'].append(self.user_feat_level3[inputs[0]][0])
+                raw_features['uiui_upload_type'].append(self.user_feat_level3[inputs[0]][1])
 
 
             if len(self.item_neighbor_nums) >= 1 and np.prod(self.item_neighbor_nums[:1]) > 0:
                 raw_features['iu'].append(inputs[17])
                 raw_features['iu_query'].append(inputs[20])
-                raw_features['iu_sex'].append(self.item_feat_level1[0])
-                raw_features['iu_age'].append(self.item_feat_level1[1])
-                raw_features["iu_search_active"].append(self.item_feat_level1[2])
+                raw_features['iu_sex'].append(self.item_feat_level1[inputs[4]][0])
+                raw_features['iu_age'].append(self.item_feat_level1[inputs[4]][1])
+                raw_features["iu_search_active"].append(self.item_feat_level1[inputs[4]][2])
 
             if len(self.item_neighbor_nums) >= 2 and np.prod(self.item_neighbor_nums[:2]) > 0:
                 raw_features['iui'].append(inputs[18])
                 raw_features['iui_query'].append(inputs[21])
-                raw_features['iui_category'].append(self.item_feat_level2[0])
-                raw_features['iui_upload_type'].append(self.item_feat_level2[1])
+                raw_features['iui_category'].append(self.item_feat_level2[inputs[4]][0])
+                raw_features['iui_upload_type'].append(self.item_feat_level2[inputs[4]][1])
 
             if len(self.item_neighbor_nums) >= 3 and np.prod(self.item_neighbor_nums[:3]) > 0:
                 raw_features['iuiu'].append(inputs[19])
                 raw_features['iuiu_query'].append(inputs[22])
-                raw_features['iuiu_sex'].append(self.item_feat_level3[0])
-                raw_features['iuiu_age'].append(self.item_feat_level3[1])
-                raw_features["iuiu_search_active"].append(self.item_feat_level3[2])
+                raw_features['iuiu_sex'].append(self.item_feat_level3[inputs[4]][0])
+                raw_features['iuiu_age'].append(self.item_feat_level3[inputs[4]][1])
+                raw_features["iuiu_search_active"].append(self.item_feat_level3[inputs[4]][2])
 
 
         return raw_features
