@@ -84,7 +84,7 @@ def parse_args():
                                 help='max number of docs in a session')
     model_settings.add_argument('--user_neighbor_nums', nargs='+', type=int, default=[25],
                                 help='define how many neighbors are sampled at the first and second orders')
-    model_settings.add_argument('--item_neighbor_nums', nargs='+', type=int, default=[1, 10],
+    model_settings.add_argument('--item_neighbor_nums', nargs='+', type=int, default=[1, 25],
                                 help='define how many neighbors are sampled at the first and second orders')
 
     train_settings = parser.add_argument_group('train settings')
