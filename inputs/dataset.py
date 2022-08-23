@@ -11,13 +11,31 @@ import numpy as np
 def get_pvtime(user_neighbor_items, i):
     return user_neighbor_items[i]['time']
 
+
 def split_list(x, max_len, seg='\x03'):
+
+    return x + [0] * (max_len - len(x)), len(x)
+
+def split_list_query(x, first_len, second_len, first_seg='\x02', second_seg='\x03'):
+    out_query = []
+    x_split = x[:first_len]
+    x_split = x_split + [] * (first_len - len(x_split))
+    for _x in x_split:
+        if len(_x.strip()) == 0:
+            _x = [0] * second_len
+        else:
+            _x = _x[:second_len]
+            _x = _x + [0] * (second_len - len(_x))
+        out_query.append(_x)
+    return out_query, first_len * second_len
+
+def split_list_str(x, max_len, seg='\x03'):
     if len(x.strip()) == 0:
         return [0] * max_len, 0
     x_split = x.split(seg)[:max_len]
     return [int(i) for i in x_split] + [0] * (max_len - len(x_split)), len(x_split)
 
-def split_list_query(x, first_len, second_len, first_seg='\x02', second_seg='\x03'):
+def split_list_query_str(x, first_len, second_len, first_seg='\x02', second_seg='\x03'):
     out_query = []
     x_split = x.split(first_seg)[:first_len]
     x_split = x_split + [''] * (first_len - len(x_split))
@@ -42,7 +60,8 @@ class Dataset():
         self.test_files = test_files
         self.features = features
         self.need_neighbor = need_neighbor
-        self.user_feat_table, self.item_feat_table, self.i_id_vocab, self.u_id_vocab, self.user_feat_table_str, self.item_feat_table_str = self.load_feat_tables()
+        self.user_feat_table, self.item_feat_table, self.i_id_vocab, self.u_id_vocab, self.user_feat_table, \
+            self.item_feat_table, self.user_feat_level1, self.user_feat_level2, self.user_feat_level3, self.item_feat_level1, self.item_feat_level2, self.item_feat_level3  = self.load_feat_tables()
         self.logger.info('Loading graph and feature tables done.')
 
     def load_feat_tables(self):
@@ -50,11 +69,24 @@ class Dataset():
         item_feat_table = cPickle.load(open(self.args.item_feat_table_path, 'rb'))
         i_id_vocab = cPickle.load(open((self.args.i_id_vocab_path), 'rb'))
         u_id_vocab = cPickle.load(open((self.args.u_id_vocab_path), 'rb'))
-        with open(self.args.user_feat_table_str_path, 'rb') as f:
-            user_feat_table_str = pickle.load(f)
-        with open(self.args.item_feat_table_str_path, 'rb') as f:
-            item_feat_table_str = pickle.load(f)
-        return user_feat_table, item_feat_table, i_id_vocab, u_id_vocab, user_feat_table_str, item_feat_table_str
+        with open(self.args.user_feat_table_path, 'rb') as f:
+            user_feat_table = pickle.load(f)
+        with open(self.args.item_feat_table_path, 'rb') as f:
+            item_feat_table = pickle.load(f)
+        with open(self.args.user_feat_level1_path, 'rb') as f:
+            user_feat_level1 = pickle.load(f)
+        with open(self.args.user_feat_level2_path, 'rb') as f:
+            user_feat_level2 = pickle.load(f)
+        with open(self.args.user_feat_level3_path, 'rb') as f:
+            user_feat_level3 = pickle.load(f) 
+        with open(self.args.item_feat_level1_path, 'rb') as f:
+            item_feat_level1 = pickle.load(f)
+        with open(self.args.item_feat_level2_path, 'rb') as f:
+            item_feat_level2 = pickle.load(f)
+        with open(self.args.item_feat_level3_path, 'rb') as f:
+            item_feat_level3 = pickle.load(f) 
+        return user_feat_table, item_feat_table, i_id_vocab, u_id_vocab, user_feat_table, item_feat_table, user_feat_level1, \
+            user_feat_level2, user_feat_level3, item_feat_level1, item_feat_level2, item_feat_level3 
 
     def get_mini_batch(self, mode):
         if mode == 'train':
@@ -117,23 +149,23 @@ class Dataset():
                     print(arr)
                     continue
                 user_id, item_id, label = map(int, map(float, [user_id, item_id, label]))
-                user_arr = self.user_feat_table_str[user_id].strip('\n').split('\t')
-                item_arr = self.item_feat_table_str[item_id].strip('\n').split('\t')
+                user_arr = self.user_feat_table_str[user_id]
+                item_arr = self.item_feat_table_str[item_id]
 
                 user_sex, user_age, user_search_active = user_arr[:3]
-                _, item_category, item_author_id, item_photo_len, item_upload_type= item_arr[:5]
+                item_category, item_author_id, item_photo_len, item_upload_type= item_arr[:4]
 
                 user_sex, user_age, user_search_active, item_category, item_author_id, item_photo_len, item_upload_type  = \
                     map(int, map(float, [user_sex, user_age, user_search_active, item_category, item_author_id, item_photo_len, item_upload_type]))
                 user_id = self.u_id_vocab[user_id]
                 item_id = self.i_id_vocab[item_id]
-                query_split, query_len = split_list(query, self.max_q_len)
+                query_split, query_len = split_list_str(query, self.max_q_len)
                 inputs = [user_id, user_sex, user_age, user_search_active, item_id, item_category, item_author_id, item_photo_len, item_upload_type, label,
                           query_split]
                 if self.need_neighbor:
-                    assert len(user_arr) == 9 and len(item_arr)==11
+                    assert len(user_arr) == 9 and len(item_arr)==10
                     ui, uiu, uiui, ui_query, uiu_query, uiui_query = user_arr[3:]
-                    iu, iui, iuiu, iu_query, iui_query, iuiu_query  = item_arr[5:]
+                    iu, iui, iuiu, iu_query, iui_query, iuiu_query  = item_arr[4:]
 
                     if len(self.user_neighbor_nums) >= 1 and np.prod(self.user_neighbor_nums[:1]) > 0:
                         ui, _ = split_list(ui, np.prod(self.user_neighbor_nums[:1]))
@@ -249,44 +281,45 @@ class Dataset():
 
         if self.need_neighbor:
             if len(self.user_neighbor_nums) >= 1 and np.prod(self.user_neighbor_nums[:1]) > 0:
-                raw_features['ui'].append([self.i_id_vocab[i] if i else i for i in inputs[11]])
+                raw_features['ui'].append(inputs[11]) ## 在外部直接转换
+
                 raw_features['ui_query'].append(inputs[14])
-                raw_features['ui_category'].append([self.item_feat_table[x]['cate'] if x else 0 for x in inputs[11]])
-                raw_features['ui_upload_type'].append([self.item_feat_table[x]['type1'] if x else 0 for x in inputs[11]])
+                raw_features['ui_category'].append(self.user_feat_level1[0])
+                raw_features['ui_upload_type'].append(self.user_feat_level1[1])
 
             if len(self.user_neighbor_nums) >= 2 and np.prod(self.user_neighbor_nums[:2]) > 0:
-                raw_features['uiu'].append([self.u_id_vocab[i] if i else i for i in inputs[12]])
+                raw_features['uiu'].append(inputs[12])
                 raw_features['uiu_query'].append(inputs[15])
-                raw_features['uiu_sex'].append([self.user_feat_table[x]['gender'] if x else 0 for x in inputs[12]])
-                raw_features['uiu_age'].append([self.user_feat_table[x]['age'] if x else 0 for x in inputs[12]])
-                raw_features["uiu_search_active"].append([self.user_feat_table[x]['src_level'] if x else 0 for x in inputs[12]])
+                raw_features['uiu_sex'].append(self.user_feat_level2[0])
+                raw_features['uiu_age'].append(self.user_feat_level2[1])
+                raw_features["uiu_search_active"].append(self.user_feat_level2[2])
 
             if len(self.user_neighbor_nums) >= 3 and np.prod(self.user_neighbor_nums[:3]) > 0:
-                raw_features['uiui'].append([self.i_id_vocab[i] if i else i for i in inputs[13]])
+                raw_features['uiui'].append(inputs[13])
                 raw_features['uiui_query'].append(inputs[16])
-                raw_features['uiui_category'].append([self.item_feat_table[x]['cate'] if x else 0 for x in inputs[13]])
-                raw_features['uiui_upload_type'].append([self.item_feat_table[x]['type1'] if x else 0 for x in inputs[13]])
+                raw_features['uiui_category'].append(self.user_feat_level3[0])
+                raw_features['uiui_upload_type'].append(self.user_feat_level3[1])
 
 
             if len(self.item_neighbor_nums) >= 1 and np.prod(self.item_neighbor_nums[:1]) > 0:
-                raw_features['iu'].append([self.u_id_vocab[i] if i else i for i in inputs[17]])
+                raw_features['iu'].append(inputs[17])
                 raw_features['iu_query'].append(inputs[20])
-                raw_features['iu_sex'].append([self.user_feat_table[x]['gender'] if x else 0 for x in inputs[17]])
-                raw_features['iu_age'].append([self.user_feat_table[x]['age'] if x else 0 for x in inputs[17]])
-                raw_features["iu_search_active"].append([self.user_feat_table[x]['src_level'] if x else 0 for x in inputs[17]])
+                raw_features['iu_sex'].append(self.item_feat_level1[0])
+                raw_features['iu_age'].append(self.item_feat_level1[1])
+                raw_features["iu_search_active"].append(self.item_feat_level1[2])
 
             if len(self.item_neighbor_nums) >= 2 and np.prod(self.item_neighbor_nums[:2]) > 0:
-                raw_features['iui'].append([self.i_id_vocab[i] if i else i for i in inputs[18]])
+                raw_features['iui'].append(inputs[18])
                 raw_features['iui_query'].append(inputs[21])
-                raw_features['iui_category'].append([self.item_feat_table[x]['cate'] if x else 0 for x in inputs[18]])
-                raw_features['iui_upload_type'].append([self.item_feat_table[x]['type1'] if x else 0 for x in inputs[18]])
+                raw_features['iui_category'].append(self.item_feat_level2[0])
+                raw_features['iui_upload_type'].append(self.item_feat_level2[1])
 
             if len(self.item_neighbor_nums) >= 3 and np.prod(self.item_neighbor_nums[:3]) > 0:
-                raw_features['iuiu'].append([self.u_id_vocab[i] if i else i for i in inputs[19]])
+                raw_features['iuiu'].append(inputs[19])
                 raw_features['iuiu_query'].append(inputs[22])
-                raw_features['iuiu_sex'].append([self.user_feat_table[x]['gender'] if x else 0 for x in inputs[19]])
-                raw_features['iuiu_age'].append([self.user_feat_table[x]['age'] if x else 0 for x in inputs[19]])
-                raw_features["iuiu_search_active"].append([self.user_feat_table[x]['src_level'] if x else 0 for x in inputs[19]])
+                raw_features['iuiu_sex'].append(self.item_feat_level3[0])
+                raw_features['iuiu_age'].append(self.item_feat_level3[1])
+                raw_features["iuiu_search_active"].append(self.item_feat_level3[2])
 
 
         return raw_features
