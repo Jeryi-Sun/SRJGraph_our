@@ -3,6 +3,7 @@
 Author:
     Yukun Zheng, zyk265182@alibaba-inc.com
 """
+from distutils.log import INFO
 import logging
 import os
 from tqdm import tqdm
@@ -24,6 +25,11 @@ from utils.metrics import judger as judge
 
 class BaseModel(object):
     def __init__(self, args):
+        logging.basicConfig(filename='../logs/SRJ.txt',
+                    filemode='a',
+                    format='%(asctime)s,%(msecs)d %(name)s %(levelname)s %(message)s',
+                    datefmt='%H:%M:%S',
+                    level=logging.INFO)
         self.args = args
         self.logger = logging.getLogger(args.model_name)
         self.dataset = None
