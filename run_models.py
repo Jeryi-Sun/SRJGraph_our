@@ -40,7 +40,7 @@ def parse_args():
                                 help='choose the algorithm to use')
     model_settings.add_argument('--model_name', default='search_graph_model',
                                 help='choose the algorithm to use')
-    model_settings.add_argument('--user_embed_size', type=int, default=32,
+    model_settings.add_argument('--user_embed_size', type=int, default=16,
                                 help='size of the embeddings')
     model_settings.add_argument('--item_embed_size', type=int, default=32,
                                 help='size of the embeddings')
@@ -175,6 +175,10 @@ def parse_args():
                                help='the dir to write tensorboard summary')
     path_settings.add_argument('--log_path',
                                help='path of the log file. If not set, logs are printed to console')
+    path_settings.add_argument('--log_name',
+                                type=str,
+                                default='model',
+                               help='name of the log file. If not set, logs are printed to console')                    
 
 
     return parser.parse_args()

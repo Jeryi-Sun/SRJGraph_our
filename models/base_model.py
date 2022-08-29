@@ -25,7 +25,7 @@ from utils.metrics import judger as judge
 
 class BaseModel(object):
     def __init__(self, args):
-        logging.basicConfig(filename='./logs/SRJ.txt',
+        logging.basicConfig(filename='./logs/{}.txt'.format(args.log_name),
                     filemode='a',
                     format='%(asctime)s,%(msecs)d %(name)s %(levelname)s %(message)s',
                     datefmt='%H:%M:%S',
